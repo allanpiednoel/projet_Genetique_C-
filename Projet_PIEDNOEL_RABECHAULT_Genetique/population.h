@@ -3,7 +3,7 @@
 #include <QList>
 #include "parametres.h"
 #include <QString>
-#define NbIndividus 1000
+#define NbIndividus 10
 
 
 class Population
