@@ -11,6 +11,7 @@ public:
     int match (Individu * ind1,Individu * ind2);
     void tournoi (int indice_p1,Population *p1, Population *p2);
     void launchEvo(Population *p1, Population *p2);
+    void AlphaVsAlpha(Population *p1, Population *p2, Population *alf1, Population *alf2);
 };
 
 #endif // BASTON_H

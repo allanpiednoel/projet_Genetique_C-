@@ -7,6 +7,11 @@
 #include "population.h"
 //#include "ratio.h"
 #include "baston.h"
+#include "../shared/qstd.h"
+using namespace qstd;
+
+
+
 class Parameters {
 public:
     static void details();
@@ -29,7 +34,10 @@ public:
     Parameters *ptr;
     static MyRandom *randomGenerator;
     static int debug;
-    static void print(QString txt, int d);};
+    static void print(QString txt, int d);
+    static float Abs(float val);
+};
+
 
 
 

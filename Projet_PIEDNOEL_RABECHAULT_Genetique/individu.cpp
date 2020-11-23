@@ -3,6 +3,11 @@
 #include <QDebug>
 
 
+int Individu::id() const
+{
+    return genome[ID];
+}
+
 int Individu::agilite() const
 {
     return genome[AGILITE];
@@ -78,8 +83,8 @@ void Individu::mutate()
 
  //si la mutation est régréssive || possibilité de mutation
 
- if (val<genome[index]||(val2*Parameters::mutationRate)<5)val=genome[index]; //mise en commentaire pour test tournoi, a reactiver
- genome[index]= val;
+ if (val<genome[index]||(val2*Parameters::mutationRate)<TAILLE_GENOME)val=genome[index]; //mise en commentaire pour test tournoi, a reactiver
+ if(index!=0)genome[index]= val;
  //qDebug()<<"on a mute";
 
 
@@ -93,11 +98,11 @@ void Individu::mutate()
 
 }
 
-Individu::Individu(int a, int f, int p, int i, int r)
+Individu::Individu(int id,int a, int f, int p, int i, int r)
 { //m_agilite(a), m_force(f), m_precision(p), m_intelligence(i), m_resistance(r)
     victoire = 0;
     defaite = 0;
-
+    genome[ID]=id;
     genome[AGILITE]=a;
     genome[FORCE]=f;
     genome[PRECISION]=p;
@@ -108,14 +113,11 @@ Individu::Individu(int a, int f, int p, int i, int r)
 }
 
 Individu::Individu(Individu *papa)
-    // on prends les caractéristiques du père
- /*   m_agilite(papa->m_agilite), m_force(papa->m_force),
-    m_precision(papa->m_precision), m_intelligence(papa->m_intelligence),
-    m_resistance(papa->m_resistance)*/
+
 {
     victoire = 0;
     defaite = 0;
-    for (int i=0; i<5; i++){
+    for (int i=1; i<TAILLE_GENOME; i++){
         genome[i]=papa->genome[i];
     }
     mutate();
@@ -124,10 +126,10 @@ Individu::Individu(Individu *papa)
 void Individu::evaluate()
 {
     m_skill=0;
-    for (int i=0; i<5; i++){
+    for (int i=1; i<TAILLE_GENOME; i++){
         m_skill+=genome[i];
     }
-    m_skill = m_skill/5; //m_skill -> moyenne car widget: lcp de 2 chiffres
+    m_skill = m_skill/TAILLE_GENOME; //m_skill -> moyenne car widget: lcp de 2 chiffres
 
 }
 
@@ -141,11 +143,16 @@ bool Individu::betterSkillThan(Individu *i1, Individu *i2)
     return i1->m_skill > i2->m_skill;
 }
 
+bool Individu::betterIDThan(Individu *i1, Individu *i2)
+{
+    return i1->genome[0] < i2->genome[0];
+}
+
 
 
 QString Individu::toString() {
     QString res;
     QTextStream buf(&res);
-    buf<<m_skill<<" : [ag="<<genome[AGILITE]<<" ; fo="<<genome[FORCE]<<" ; pre="<<genome[PRECISION]<<" ; int="<<genome[INTELLIGENCE]<<" ; res="<<genome[RESISTANCE]<<"]";
+    buf<<m_skill<<" : [id="<<genome[ID]<<" ; ag="<<genome[AGILITE]<<" ; fo="<<genome[FORCE]<<" ; pre="<<genome[PRECISION]<<" ; int="<<genome[INTELLIGENCE]<<" ; res="<<genome[RESISTANCE]<<"]"<<endl;
     return res;
 }

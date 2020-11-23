@@ -3,7 +3,7 @@
 #include <QList>
 #include "parametres.h"
 #include <QString>
-#define NbIndividus 5
+#define NbIndividus 1000
 
 
 class Population
@@ -13,8 +13,10 @@ private:
 //    int defaite=0;
 
 public:
-    int generationNb;
+    int generationNb=0;
+    float Defaites[NbIndividus];
     float ratios[NbIndividus];
+    float ID[NbIndividus];
     Population();
     QList <Individu *>liste_individu;
     void evaluate();
@@ -22,6 +24,7 @@ public:
     int skillmedian();
     void BigMutate(int seuil_a_atteindre);
     void evolutionnaryProcess();
+
 
 };
 

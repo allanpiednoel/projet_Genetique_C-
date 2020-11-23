@@ -4,7 +4,7 @@ using namespace qstd;
 //QList <Individu *> Parameters::population_1;
 //QList <Individu *> Parameters::population_2;
 int Parameters::individualsNb =NbIndividus;
-int Parameters::marge_match_nul=2;
+int Parameters::marge_match_nul=5;
 int Parameters::generationsMaxNb = 100;
 int Parameters::skillMoyen = 60;
 //int ratio=0;
@@ -24,7 +24,7 @@ int Parameters::indiv_fam_2;
 // - 0 : non aléatoire pour debug
 // - rien : aléatoire
 // ******************************************************
-MyRandom *Parameters::randomGenerator=new MyRandom(30);//30
+MyRandom *Parameters::randomGenerator=new MyRandom();//30//10(match nul alpha)
 
 int Parameters::debug = 1;
 
@@ -70,4 +70,10 @@ void Parameters::details()
     cout<<"sinon, il y a match nul."<<endl;
     cout<<endl<<"-A l'issue, on calcul et on recupere le ratio de chaque individu."<<endl;
     cout<<"-L'individu le plus nul a une chance de muter"<<endl<<endl<<endl;
+}
+
+float Parameters::Abs(float val)
+{
+    if (val<0)return -val;
+    else return val;
 }

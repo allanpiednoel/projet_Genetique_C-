@@ -1,5 +1,3 @@
-#include "../shared/qstd.h"
-using namespace qstd;
 #include "parametres.h"
 #include <QList>
 #include <QDebug>
@@ -16,7 +14,8 @@ int main()
     baston b;
     Population population_1;
     Population population_2;
-
+    Population alpha_1;
+    Population alpha_2;
     // remplissage
 
     for (int i=0; i<NbIndividus;i++)
@@ -29,7 +28,7 @@ int main()
     int resistance =Parameters::randomGenerator->get(100) ;
 
 
-    population_1.liste_individu.append(new Individu(agilite,force,precision,intelligence,resistance));
+    population_1.liste_individu.append(new Individu(i,agilite,force,precision,intelligence,resistance));
     }
 
     // remplissage
@@ -45,7 +44,7 @@ int main()
 
 
 
-    population_2.liste_individu.append(new Individu(agilite,force,precision,intelligence,resistance));
+    population_2.liste_individu.append(new Individu(i,agilite,force,precision,intelligence,resistance));
     }
 
     //affichage de la liste non triée
@@ -61,7 +60,6 @@ int main()
     std::sort(population_1.liste_individu.begin(), population_1.liste_individu.end(), Individu::betterSkillThan);
     std::sort(population_2.liste_individu.begin(), population_2.liste_individu.end(), Individu::betterSkillThan);
 
-
     cout<<endl<<"-listes triees :"<<endl<<"population 1 : "<<endl;
     cout<<population_1.tooString()<<endl;
     cout<<"population 2 : "<<endl;
@@ -72,11 +70,11 @@ int main()
      cout<<"-skill med pop_1: "<<population_1.skillmedian()<<endl;
      cout<<"-skill med pop_2: "<<population_2.skillmedian()<<endl;
 
-     if (population_1.skillmedian()-population_2.skillmedian()!=0)
+     if (population_1.skillmedian()-population_2.skillmedian()!=0||population_1.skillmedian()<Parameters::skillMoyen)
      {
          //big mutate
-         cout<<endl<<"***big mutate fait evoluer tout le monde jusqu'a ce que la famille soit level :"<<Parameters::skillMoyen<<".***"<<endl<<endl;
-         cout<<"-bigmutate pop_1: "<<endl;
+         //cout<<endl<<"***big mutate fait evoluer tout le monde jusqu'a ce que la famille soit level :"<<Parameters::skillMoyen<<".***"<<endl<<endl;
+         cout<<endl<<"-bigmutate pop_1: "<<endl;
          population_1.BigMutate(Parameters::skillMoyen);
          cout<<population_1.tooString()<<endl;
          cout<<"-bigmutate pop_2: "<<endl;
@@ -86,8 +84,8 @@ int main()
      cout<<endl<<"-skill population 1: "<<population_1.skillmedian()<<endl;
      cout<<"-skill population 2: "<<population_2.skillmedian()<<endl<<endl;
 
-     //std::sort(population_1.liste_individu.begin(), population_1.liste_individu.end(), Individu::betterSkillThan);
-     //std::sort(population_2.liste_individu.begin(), population_2.liste_individu.end(), Individu::betterSkillThan);
+     std::sort(population_1.liste_individu.begin(), population_1.liste_individu.end(), Individu::betterSkillThan);
+     std::sort(population_2.liste_individu.begin(), population_2.liste_individu.end(), Individu::betterSkillThan);
 
 
     /* cout<<"-listes des individus :"<<endl<<"population 1 : "<<endl;
@@ -96,66 +94,52 @@ int main()
      cout<<population_2.tooString()<<endl<<endl;*/
 
      cout<<"nombre de mutation effectuees: "<<endl<<"-pop_1 : "<<population_1.generationNb<<endl;
+     cout<<"    chaque membres ont eu une chance de muter "<<population_1.generationNb/(NbIndividus)<<" fois"<<endl<<endl;
      cout<<"-pop_2 : "<<population_2.generationNb<<endl;
+     cout<<"    chaque membres ont eu une chance de muter "<<population_2.generationNb/(NbIndividus)<<" fois"<<endl<<endl;
+
+     alpha_1.liste_individu.append(population_1.liste_individu.at(0));
+     alpha_2.liste_individu.append(population_2.liste_individu.at(0));
+
+     population_1.liste_individu.removeFirst();
+     population_2.liste_individu.removeFirst();
+
+     cout<<"-alphas :"<<endl<<"meilleur de la famille 1: "<<endl<<alpha_1.tooString()<<endl;
+     cout<<"meilleur de la famille 2: "<<endl<<alpha_2.tooString()<<endl;
+
 
     //test tournoi
     int i_1=1;
     int i_2=1;
-    for(int i=0; i<NbIndividus;i++){
+    for(int i=0; i<NbIndividus-1;i++){
      b.tournoi(i,&population_1, &population_2);}
 
     cout<<endl<<"scores famille 1 : V/D  ratio"<<endl;
 
+    //triage en fonction de l'ID
+
+    std::sort(population_1.liste_individu.begin(), population_1.liste_individu.end(), Individu::betterIDThan);
+    std::sort(population_2.liste_individu.begin(), population_2.liste_individu.end(), Individu::betterIDThan);
+    //cout<<population_1.tooString()<<endl;
+    //cout<<population_2.tooString()<<endl;
+
     foreach(Individu *ind, population_1.liste_individu){
-        cout<<"Individu num "<<i_1<<": "<<ind->getVictoire()<<"/"<<ind->getDefaite()<<"     "<<ind->Ratio()<<endl;
+        cout<<"Individu num "<<ind->genome[0]<<": "<<ind->getVictoire()<<"/"<<ind->getDefaite()<<"     "<<ind->Ratio()<<endl;
         i_1++;
     }
 
     cout<<endl<<"scores famille 2 : V/D  ratio"<<endl;
 
     foreach(Individu *ind, population_2.liste_individu){
-        cout<<"Individu num "<<i_2<<": "<<ind->getVictoire()<<"/"<<ind->getDefaite()<<"     "<<ind->Ratio()<<endl;
+        cout<<"Individu num "<<ind->genome[0]<<": "<<ind->getVictoire()<<"/"<<ind->getDefaite()<<"     "<<ind->Ratio()<<endl;
         i_2++;
     }
 
 
+    //TODO:
+    //recuperer l'alpha, ne pas le faire muter, (puis faire alpha vs alpha, il ne se bat qu'avec l'autre )
+   cout<<endl<<"lancement evo"<<endl<<endl;
+   b.launchEvo(&population_1, &population_2);
+   b.AlphaVsAlpha(&population_1, &population_2, &alpha_1, &alpha_2);
 
-    b.launchEvo(&population_1, &population_2);
-
-    //réaffichage de liste_individu pour test mutation issu du tournoi
-
-   /* cout<<"population 1 : "<<endl;
-    cout<<population_1.tooString()<<endl;
-    cout<<"population 2 : "<<endl;
-    cout<<population_2.tooString()<<endl;*/
-
-
-    /*foreach (Individu *ind, population_1.liste_individu) {
-        ind->
-    }*/
-
-   /*
-
-
-
-     //test nb generations
-
-     cout<<"test skillmedian population 1: "<<population_1.skillmedian()<<endl;
-     cout<<"test skillmedian population 2: "<<population_2.skillmedian()<<endl;
-     cout<<"nombre de generations pop_1 : "<<population_1.generationNb<<endl;
-     cout<<"nombre de generations pop_2 : "<<population_2.generationNb<<endl;
-
-     cout <<"test evo : "<<endl;*/
-
-
-/*ap
-
-    foreach (Individu *ind, Parameters::population_1) {
-        qDebug()<<"avant mutation";
-        cout<<ind->toString()<<endl;
-        ind->mutate();
-        ind->evaluate();
-        qDebug()<<"apres mutation";
-        cout<<ind->toString()<<endl;}
-   // cout<<endl<<Individu::ptr;*/
 }
